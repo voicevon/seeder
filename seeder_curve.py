@@ -3,7 +3,12 @@ sys.path.append('C:\\Users\\von\AppData\\Local\\Packages\\PythonSoftwareFoundati
 
 import serial, time
 # pip install pyserial
-# pip3 install pyserial
+# 
+import xlsxwriter
+# pip install xlsxWriter
+
+
+
 class CurveMaker():
 
     def __init__(self, portname, rate):
@@ -15,7 +20,8 @@ class CurveMaker():
 
             self.__synced = False
             self.__package_length = 8
-
+            self.workbook = xlsxwriter.Workbook('seeder.xlsx')
+            self.worksheet = self.workbook.add_worksheet()
     def read_packages(self):
         head = 0
         while True:
@@ -36,10 +42,15 @@ class CurveMaker():
                         print('Warning, Lost sync')
                     return err,val
     def main(self):
-        while True:
+        count = 0
+        while count < 10000:
             err, val = self.read_packages()
-            print(err, val)
+            count += 1
+            print(count, err, val)
+            self.worksheet.write('A' + str(count), err)
+            self.worksheet.write('B' + str(count), val)
             # print(err)
+        self.workbook.close()
 
 tester = CurveMaker('COM4', 115200)
 tester.main()
