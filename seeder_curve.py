@@ -11,7 +11,7 @@ import xlsxwriter
 
 class CurveMaker():
 
-    def __init__(self, portname, rate):
+    def __init__(self, portname, rate, rows=9999):
             self.__serialport = serial.Serial()
             self.__serialport.port = portname
             self.__serialport.baudrate = rate
@@ -22,6 +22,7 @@ class CurveMaker():
             self.__package_length = 8
             self.workbook = xlsxwriter.Workbook('seeder.xlsx')
             self.worksheet = self.workbook.add_worksheet()
+            self.rows = rows
     def read_packages(self):
         head = 0
         while True:
@@ -41,9 +42,11 @@ class CurveMaker():
                     if sync != b'\xff':
                         print('Warning, Lost sync')
                     return err,val
+
+
     def main(self):
         count = 0
-        while count < 10000:
+        while count < self.rows:
             err, val = self.read_packages()
             count += 1
             print(count, err, val)
@@ -52,5 +55,5 @@ class CurveMaker():
             # print(err)
         self.workbook.close()
 
-tester = CurveMaker('COM4', 115200)
+tester = CurveMaker('COM4', 115200, rows= 9999)
 tester.main()
